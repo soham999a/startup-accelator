@@ -2,6 +2,12 @@
   base = "metaverse/apps/frontend"
   publish = "metaverse/apps/frontend/dist"
   command = "npm run build"
+  functions = "metaverse/apps/frontend/netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
 
 [[redirects]]
   from = "/*"
@@ -15,9 +21,10 @@
 # Environment variables for production
 [context.production.environment]
   VITE_USE_MOCK_API = "true"
-  VITE_API_URL = "https://your-api.railway.app"
-  VITE_SOCKET_URL = "https://your-websocket.railway.app"
+  VITE_API_URL = "/.netlify/functions"
+  VITE_SOCKET_URL = ""
 
 # Environment variables for deploy previews
 [context.deploy-preview.environment]
   VITE_USE_MOCK_API = "true"
+  VITE_API_URL = "/.netlify/functions"
