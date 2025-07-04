@@ -1,1 +1,1 @@
-export const JWT_PASSWORD = "123kasdk123"
+export const JWT_PASSWORD = process.env.JWT_PASSWORD || "startup_accelerator_secret_key_2024"

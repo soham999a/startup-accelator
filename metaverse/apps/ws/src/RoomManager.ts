@@ -1,8 +1,14 @@
-import type { User } from "./User";
-import { OutgoingMessage } from "./types";
+export interface RoomUser {
+    id: string;
+    username: string;
+    userType: string;
+    x: number;
+    y: number;
+    socketId: string;
+}
 
 export class RoomManager {
-    rooms: Map<string, User[]> = new Map();
+    rooms: Map<string, RoomUser[]> = new Map();
     static instance: RoomManager;
 
     private constructor() {
@@ -16,29 +22,64 @@ export class RoomManager {
         return this.instance;
     }
 
-    public removeUser(user: User, spaceId: string) {
+    public removeUser(userId: string, spaceId: string) {
         if (!this.rooms.has(spaceId)) {
             return;
         }
-        this.rooms.set(spaceId, (this.rooms.get(spaceId)?.filter((u) => u.id !== user.id) ?? []));
+        const users = this.rooms.get(spaceId) || [];
+        this.rooms.set(spaceId, users.filter((u) => u.id !== userId));
+
+        // Clean up empty rooms
+        if (this.rooms.get(spaceId)?.length === 0) {
+            this.rooms.delete(spaceId);
+        }
     }
 
-    public addUser(spaceId: string, user: User) {
+    public addUser(spaceId: string, user: RoomUser) {
         if (!this.rooms.has(spaceId)) {
             this.rooms.set(spaceId, [user]);
             return;
         }
-        this.rooms.set(spaceId, [...(this.rooms.get(spaceId) ?? []), user]);
+
+        // Remove user if already exists (reconnection case)
+        this.removeUser(user.id, spaceId);
+
+        // Add user to room
+        const users = this.rooms.get(spaceId) || [];
+        this.rooms.set(spaceId, [...users, user]);
     }
 
-    public broadcast(message: OutgoingMessage, user: User, roomId: string) {
-        if (!this.rooms.has(roomId)) {
+    public updateUserPosition(userId: string, spaceId: string, x: number, y: number) {
+        if (!this.rooms.has(spaceId)) {
             return;
         }
-        this.rooms.get(roomId)?.forEach((u) => {
-            if (u.id !== user.id) {
-                u.send(message);
-            }
+
+        const users = this.rooms.get(spaceId) || [];
+        const userIndex = users.findIndex(u => u.id === userId);
+
+        if (userIndex !== -1) {
+            users[userIndex].x = x;
+            users[userIndex].y = y;
+        }
+    }
+
+    public getUsersInRoom(spaceId: string): RoomUser[] {
+        return this.rooms.get(spaceId) || [];
+    }
+
+    public getUserCount(spaceId: string): number {
+        return this.rooms.get(spaceId)?.length || 0;
+    }
+
+    public getAllRooms(): Map<string, RoomUser[]> {
+        return this.rooms;
+    }
+
+    public getRoomStats() {
+        const stats: { [spaceId: string]: number } = {};
+        this.rooms.forEach((users, spaceId) => {
+            stats[spaceId] = users.length;
         });
+        return stats;
     }
 }

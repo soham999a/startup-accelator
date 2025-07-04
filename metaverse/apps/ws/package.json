@@ -14,9 +14,13 @@
   "dependencies": {
     "@repo/db": "workspace:*",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/ws": "^8.5.12",
+    "@types/node": "^20.0.0",
     "esbuild": "^0.24.0",
     "jsonwebtoken": "^9.0.2",
-    "ws": "^8.18.0"
+    "socket.io": "^4.7.5",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17"
   }
 }

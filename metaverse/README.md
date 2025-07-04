@@ -1,36 +1,80 @@
-# Turborepo starter
+# 🚀 Startup Accelerator Metaverse
 
-This is an official starter Turborepo.
+A 2D multiplayer real-time environment where startup founders can pitch, mentors can guide, and investors can interact through different virtual spaces.
 
-## Using this example
+## 🛠️ Tech Stack
 
-Run the following command:
+- **Frontend**: React.js + TypeScript + TailwindCSS + Vite
+- **Backend**: Node.js + Express + TypeScript
+- **Database**: MongoDB + Prisma ORM
+- **Real-time**: Socket.IO
+- **Authentication**: JWT
+- **Package Manager**: pnpm (Turborepo)
 
-```sh
-npx create-turbo@latest
+## 📋 Prerequisites
+
+1. **Node.js** (v18 or higher) - Download from: https://nodejs.org/
+2. **MongoDB** - Local installation or MongoDB Atlas (cloud)
+3. **pnpm** - Install with: `npm install -g pnpm`
+
+## 🚀 Quick Start
+
+### Option 1: Using the Startup Script (Windows)
+```bash
+# Navigate to the project directory
+cd "c:\Users\code7\Desktop\metaverse game\2d-metaverse\metaverse"
+
+# Run the startup script
+start.bat
 ```
 
-## What's inside?
+### Option 2: Manual Setup
+```bash
+# 1. Install dependencies
+pnpm install
 
-This Turborepo includes the following packages/apps:
+# 2. Generate Prisma client
+cd packages/db && pnpm prisma generate && cd ../..
 
-### Apps and Packages
+# 3. Start all services
+pnpm dev
+```
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 🌐 Access Points
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:3000
+- **WebSocket Server**: http://localhost:3001
 
-### Utilities
+## 👥 User Types
 
-This Turborepo has some additional tools already setup for you:
+- **🚀 Founders** - Create startups, pitch to investors
+- **🧠 Mentors** - Guide startups, conduct sessions
+- **💰 Investors** - Fund startups, attend pitches
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## 🏛️ Virtual Spaces
+
+1. **Lobby** - Main gathering area with real-time presence
+2. **Startup Booths** - Individual startup showcase spaces
+3. **Pitch Stage** - Live presentations with Q&A
+4. **Mentor Lounge** - 1:1 guidance sessions
+5. **Investor Island** - Premium networking zone
+6. **Resource Pavilion** - Learning materials and tools
+
+## 🔧 Environment Setup
+
+All `.env` files are pre-configured. For MongoDB Atlas, update the `DATABASE_URL` in:
+- `apps/http/.env`
+- `apps/ws/.env`
+- `packages/db/.env`
+
+## 🎯 Getting Started
+
+1. **Install Node.js** from https://nodejs.org/
+2. **Run the startup script** or follow manual setup
+3. **Open** http://localhost:5173
+4. **Sign up** and choose your user type
+5. **Explore** the metaverse and connect with others!
 
 ### Build
 
