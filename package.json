@@ -1,0 +1,17 @@
+{
+  "name": "startup-accelerator",
+  "version": "1.0.0",
+  "description": "2D Metaverse Startup Accelerator Platform",
+  "scripts": {
+    "build": "cd metaverse/apps/frontend && npm install && npm run build",
+    "dev": "cd metaverse/apps/frontend && npm run dev",
+    "install-frontend": "cd metaverse/apps/frontend && npm install"
+  },
+  "workspaces": [
+    "metaverse/apps/frontend"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

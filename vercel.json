@@ -1,15 +1,22 @@
 {
-  "buildCommand": "cd metaverse/apps/frontend && npm run build",
-  "outputDirectory": "metaverse/apps/frontend/dist",
-  "framework": "vite",
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "src": "metaverse/apps/frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/metaverse/apps/frontend/api/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/metaverse/apps/frontend/dist/$1"
     }
   ]
 }
