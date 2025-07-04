@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? '/.netlify/functions' : 'http://localhost:3000')
+  (import.meta.env.PROD ? '/api' : 'http://localhost:3000')
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API !== 'false' // Default to true for development
 
 // Create axios instance
