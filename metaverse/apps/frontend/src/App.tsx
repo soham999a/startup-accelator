@@ -12,6 +12,7 @@ import BottomNavigation from './components/layout/BottomNavigation'
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage'
 import SignupPage from './pages/auth/SignupPage'
+import LogoutPage from './pages/LogoutPage'
 
 // Main Pages
 import DashboardPage from './pages/DashboardPage'
@@ -155,6 +156,12 @@ function App() {
             element={
               isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
             }
+          />
+
+          {/* Logout Route */}
+          <Route
+            path="/logout"
+            element={<LogoutPage />}
           />
 
           {/* Public Routes */}
