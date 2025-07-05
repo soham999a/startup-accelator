@@ -23,7 +23,8 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     logout()
     toast.success('Logged out successfully')
-    navigate('/login')
+    // Force page reload to ensure clean state
+    window.location.href = '/login'
   }
 
   const toggleDarkMode = () => {

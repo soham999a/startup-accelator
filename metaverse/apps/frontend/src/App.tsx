@@ -149,6 +149,14 @@ function App() {
         />
 
         <Routes>
+          {/* Root Route */}
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+            }
+          />
+
           {/* Public Routes */}
           <Route
             path="/login"
@@ -180,7 +188,6 @@ function App() {
                   {/* Page Content */}
                   <main className="flex-1 overflow-auto pb-16 sm:pb-0">
                     <Routes>
-                      <Route path="/" element={<Navigate to="/dashboard" replace />} />
                       <Route path="/dashboard" element={<DashboardPage />} />
                       <Route path="/lobby" element={<LobbyPage />} />
                       <Route path="/profile" element={<ProfilePage />} />
