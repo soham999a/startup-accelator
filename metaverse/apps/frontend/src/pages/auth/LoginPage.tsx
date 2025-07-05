@@ -7,6 +7,7 @@ import { authAPI } from '../../lib/api'
 import { useAuthStore } from '../../store/authStore'
 import { cn } from '../../lib/utils'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import GoogleOAuthButton from '../../components/auth/GoogleOAuthButton'
 
 interface LoginFormData {
   email: string
@@ -158,6 +159,25 @@ const LoginPage: React.FC = () => {
               )}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Google OAuth Button */}
+          <div className="mt-6">
+            <GoogleOAuthButton mode="signin" />
+          </div>
 
           {/* Footer */}
           <div className="mt-6 text-center">

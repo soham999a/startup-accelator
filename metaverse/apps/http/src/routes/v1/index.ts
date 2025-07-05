@@ -9,6 +9,7 @@ import {hash, compare} from "../../scrypt";
 import client from "@repo/db/client";
 import jwt from "jsonwebtoken";
 import { JWT_PASSWORD } from "../../config";
+import { OAuth2Client } from 'google-auth-library';
 
 export const router = Router();
 
@@ -163,6 +164,103 @@ router.get("/avatars", async (req, res) => {
         name: x.name
     }))})
 })
+
+// Google OAuth configuration
+const googleClient = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+);
+
+// Google OAuth routes
+router.post("/auth/google", async (req, res) => {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            res.status(400).json({ message: "Google credential is required" });
+            return;
+        }
+
+        // Verify the Google token
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        if (!payload) {
+            res.status(400).json({ message: "Invalid Google token" });
+            return;
+        }
+
+        const { email, given_name, family_name, picture, sub: googleId } = payload;
+
+        if (!email) {
+            res.status(400).json({ message: "Email not provided by Google" });
+            return;
+        }
+
+        // Check if user exists
+        let user = await client.user.findUnique({
+            where: { email },
+            include: {
+                startupProfile: true,
+                mentorProfile: true,
+                investorProfile: true
+            }
+        });
+
+        if (!user) {
+            // Create new user with Google OAuth
+            const username = email.split('@')[0] + '_' + Math.random().toString(36).substring(7);
+
+            user = await client.user.create({
+                data: {
+                    username,
+                    email,
+                    password: '', // Empty password for OAuth users
+                    firstName: given_name || '',
+                    lastName: family_name || '',
+                    profileImage: picture || '',
+                    userType: 'FOUNDER', // Default user type
+                    role: 'User',
+                    isVerified: true, // Google users are pre-verified
+                },
+                include: {
+                    startupProfile: true,
+                    mentorProfile: true,
+                    investorProfile: true
+                }
+            });
+        } else {
+            // Update last active timestamp
+            await client.user.update({
+                where: { id: user.id },
+                data: { lastActive: new Date() }
+            });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({
+            userId: user.id,
+            role: user.role,
+            userType: user.userType
+        }, JWT_PASSWORD);
+
+        // Return user data (excluding password)
+        const { password, ...userWithoutPassword } = user;
+
+        res.json({
+            token,
+            user: userWithoutPassword
+        });
+
+    } catch (error) {
+        console.error('Google OAuth error:', error);
+        res.status(500).json({ message: "Authentication failed" });
+    }
+});
 
 router.use("/user", userRouter)
 router.use("/space", spaceRouter)
