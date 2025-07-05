@@ -9,7 +9,12 @@ import client from './db/client';
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"], // Frontend URLs
+    origin: process.env.NODE_ENV === 'production'
+      ? [
+          process.env.FRONTEND_URL || 'https://startup-accelerator-k3woo186-dassoham345-gmailcoms-projects.vercel.app',
+          'https://startup-accelerator-k3woo186-dassoham345-gmailcoms-projects.vercel.app'
+        ]
+      : ["http://localhost:5173", "http://localhost:3000"], // Frontend URLs
     methods: ["GET", "POST"],
     credentials: true
   }
