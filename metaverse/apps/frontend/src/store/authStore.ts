@@ -122,10 +122,16 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        // Clear localStorage
-        localStorage.removeItem('auth-storage')
-        localStorage.removeItem('auth_user')
-        localStorage.removeItem('auth_token')
+        try {
+          // Clear localStorage safely
+          if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.removeItem('auth-storage')
+            localStorage.removeItem('auth_user')
+            localStorage.removeItem('auth_token')
+          }
+        } catch (error) {
+          console.warn('Failed to clear localStorage:', error)
+        }
 
         set({
           isAuthenticated: false,

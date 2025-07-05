@@ -10,13 +10,19 @@ const LogoutPage: React.FC = () => {
   useEffect(() => {
     // Clear all authentication data
     logout()
-    
-    // Clear localStorage completely
-    localStorage.clear()
-    
+
+    // Clear localStorage completely with error handling
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.clear()
+      }
+    } catch (error) {
+      console.warn('Failed to clear localStorage:', error)
+    }
+
     // Show success message
     toast.success('Logged out successfully!')
-    
+
     // Redirect to login after a short delay
     setTimeout(() => {
       window.location.href = '/login'
