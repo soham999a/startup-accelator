@@ -1,0 +1,440 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  username String  @unique
+  email    String  @unique
+  password String
+  avatarId String? @db.ObjectId
+  role     Role
+
+  // Profile Information
+  firstName     String?
+  lastName      String?
+  bio           String?
+  profileImage  String?
+
+  // Startup Accelerator Specific Fields
+  userType      UserType @default(FOUNDER)
+  isVerified    Boolean  @default(false)
+  joinedAt      DateTime @default(now())
+  lastActive    DateTime @default(now())
+
+  // Relations
+  spaces        Space[]
+  avatar        Avatar?           @relation(fields: [avatarId], references: [id])
+  startupProfile StartupProfile?
+  mentorProfile  MentorProfile?
+  investorProfile InvestorProfile?
+
+  // Activity Relations
+  pitchSessions  PitchSession[]   @relation("PitchPresenter")
+  pitchAttendances PitchAttendance[]
+  mentorBookings MentorBooking[]  @relation("BookingFounder")
+  investorMeetings InvestorMeeting[] @relation("MeetingFounder")
+  qnaQuestions   QnAQuestion[]
+  qnaVotes       QnAVote[]
+  announcements  Announcement[]   @relation("AnnouncementCreator")
+}
+
+model Space {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  width     Int
+  height    Int
+  thumbnail String?
+  creatorId String  @db.ObjectId
+  creator     User    @relation(fields: [creatorId], references: [id])
+  elements  spaceElements[]
+}
+
+model spaceElements {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  elementId String @db.ObjectId
+  spaceId   String @db.ObjectId
+  x         Int
+  y         Int
+  space     Space  @relation(fields: [spaceId], references: [id])
+  element   Element @relation(fields: [elementId], references: [id])
+}
+
+model Element {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  width           Int
+  height          Int
+  static          Boolean
+  imageUrl        String
+  spaces          spaceElements[]
+  mapElements     MapElements[]
+}
+
+model Map {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  width  Int
+  height Int
+  name   String
+  thumbnail String
+  mapElements MapElements[]
+}
+
+model MapElements {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  mapId     String  @db.ObjectId
+  elementId String  @db.ObjectId
+  x         Int?
+  y         Int?
+  map       Map     @relation(fields: [mapId], references: [id])
+  element   Element @relation(fields: [elementId], references: [id])
+}
+
+model Avatar {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl String?
+  name     String?
+  users    User[]
+}
+
+enum Role {
+  Admin
+  User
+}
+
+enum UserType {
+  FOUNDER
+  MENTOR
+  INVESTOR
+  ADMIN
+}
+
+enum StartupStage {
+  IDEA
+  MVP
+  EARLY_STAGE
+  GROWTH
+  SCALE_UP
+}
+
+enum InvestmentFocus {
+  FINTECH
+  HEALTHTECH
+  EDTECH
+  SAAS
+  ECOMMERCE
+  AI_ML
+  BLOCKCHAIN
+  CLIMATE_TECH
+  BIOTECH
+  CONSUMER_APPS
+  B2B_TOOLS
+  OTHER
+}
+
+enum MentorExpertise {
+  PRODUCT_DEVELOPMENT
+  MARKETING
+  SALES
+  FUNDRAISING
+  OPERATIONS
+  TECHNOLOGY
+  LEGAL
+  FINANCE
+  HR
+  STRATEGY
+  DESIGN
+  GROWTH_HACKING
+}
+
+enum PitchStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// Startup Profile Model
+model StartupProfile {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String @unique @db.ObjectId
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Basic Info
+  startupName String
+  tagline     String?
+  description String?
+  website     String?
+  logo        String?
+
+  // Business Details
+  sector      String?
+  stage       StartupStage @default(IDEA)
+  foundedYear Int?
+  teamSize    Int?
+  location    String?
+
+  // Pitch Materials
+  pitchDeckUrl   String?
+  videoPitchUrl  String?
+  demoUrl        String?
+
+  // Social Links
+  linkedinUrl    String?
+  twitterUrl     String?
+  githubUrl      String?
+
+  // Funding Info
+  fundingGoal    Float?
+  currentFunding Float?
+  previousRounds String?
+
+  // Booth Configuration
+  boothTheme     String? @default("default")
+  boothBanner    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Mentor Profile Model
+model MentorProfile {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String @unique @db.ObjectId
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Professional Info
+  title       String
+  company     String?
+  experience  Int? // years of experience
+  expertise   MentorExpertise[]
+
+  // Availability
+  isAvailable Boolean @default(true)
+  hourlyRate  Float?
+  timezone    String?
+
+  // Profile Details
+  achievements String?
+  linkedinUrl  String?
+  calendlyUrl  String?
+
+  // Booking Settings
+  sessionDuration Int @default(30) // minutes
+  maxBookingsPerDay Int @default(5)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bookings MentorBooking[]
+}
+
+// Investor Profile Model
+model InvestorProfile {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String @unique @db.ObjectId
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Professional Info
+  firm        String
+  title       String
+  investmentFocus InvestmentFocus[]
+
+  // Investment Details
+  minInvestment Float?
+  maxInvestment Float?
+  preferredStage StartupStage[]
+
+  // Profile Details
+  bio         String?
+  linkedinUrl String?
+  firmWebsite String?
+  portfolioUrl String?
+
+  // Availability
+  isAvailable Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  meetings InvestorMeeting[]
+}
+
+// Pitch Session Model
+model PitchSession {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  presenterId String @db.ObjectId
+  presenter   User   @relation("PitchPresenter", fields: [presenterId], references: [id])
+
+  title       String
+  description String?
+  scheduledAt DateTime
+  duration    Int @default(10) // minutes
+  status      PitchStatus @default(SCHEDULED)
+
+  // Stage Configuration
+  maxAttendees Int @default(50)
+  isRecorded   Boolean @default(false)
+  recordingUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  attendances PitchAttendance[]
+  questions QnAQuestion[]
+}
+
+// Pitch Attendance Junction Table
+model PitchAttendance {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  pitchSessionId String @db.ObjectId
+  pitchSession  PitchSession @relation(fields: [pitchSessionId], references: [id])
+
+  attendeeId    String @db.ObjectId
+  attendee      User @relation(fields: [attendeeId], references: [id])
+
+  joinedAt      DateTime @default(now())
+  leftAt        DateTime?
+
+  @@unique([pitchSessionId, attendeeId])
+}
+
+// Q&A System
+model QnAQuestion {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  pitchSessionId String @db.ObjectId
+  pitchSession  PitchSession @relation(fields: [pitchSessionId], references: [id])
+
+  askerId       String @db.ObjectId
+  asker         User   @relation(fields: [askerId], references: [id])
+
+  question      String
+  answer        String?
+  isAnswered    Boolean @default(false)
+  upvotes       Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  votes QnAVote[]
+}
+
+model QnAVote {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  questionId String @db.ObjectId
+  question   QnAQuestion @relation(fields: [questionId], references: [id])
+
+  voterId    String @db.ObjectId
+  voter      User @relation(fields: [voterId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([questionId, voterId])
+}
+
+// Mentor Booking System
+model MentorBooking {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  mentorId  String @db.ObjectId
+  mentor    MentorProfile @relation(fields: [mentorId], references: [id])
+
+  founderId String @db.ObjectId
+  founder   User @relation("BookingFounder", fields: [founderId], references: [id])
+
+  scheduledAt DateTime
+  duration    Int @default(30) // minutes
+  status      BookingStatus @default(PENDING)
+
+  // Meeting Details
+  meetingUrl  String?
+  notes       String?
+  feedback    String?
+  rating      Int? // 1-5 stars
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Investor Meeting System
+model InvestorMeeting {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  investorId String @db.ObjectId
+  investor   InvestorProfile @relation(fields: [investorId], references: [id])
+
+  founderId  String @db.ObjectId
+  founder    User @relation("MeetingFounder", fields: [founderId], references: [id])
+
+  scheduledAt DateTime
+  duration    Int @default(45) // minutes
+  status      BookingStatus @default(PENDING)
+
+  // Meeting Details
+  meetingUrl  String?
+  agenda      String?
+  notes       String?
+  followUp    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Announcements System
+model Announcement {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  creatorId String @db.ObjectId
+  creator   User @relation("AnnouncementCreator", fields: [creatorId], references: [id])
+
+  title     String
+  content   String
+  type      String @default("general") // general, event, urgent
+
+  // Display Settings
+  isActive  Boolean @default(true)
+  isPinned  Boolean @default(false)
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Events System
+model Event {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+
+  // Event Details
+  type        String // pitch_day, networking, workshop
+  location    String? // virtual room or physical location
+  maxAttendees Int?
+
+  // Configuration
+  isActive    Boolean @default(true)
+  requiresRSVP Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

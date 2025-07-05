@@ -4,7 +4,7 @@ import cors from 'cors';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { JWT_PASSWORD } from './config';
 import { RoomManager } from './RoomManager';
-import client from '@repo/db/client';
+import client from './db/client';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {

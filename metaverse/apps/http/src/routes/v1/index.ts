@@ -6,7 +6,7 @@ import { profilesRouter } from "./profiles";
 import { aiRouter } from "./ai";
 import { SigninSchema, SignupSchema } from "../../types";
 import {hash, compare} from "../../scrypt";
-import client from "@repo/db/client";
+import client from "../../db/client";
 import jwt from "jsonwebtoken";
 import { JWT_PASSWORD } from "../../config";
 import { OAuth2Client } from 'google-auth-library';

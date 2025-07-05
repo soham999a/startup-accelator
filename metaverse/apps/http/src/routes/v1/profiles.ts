@@ -1,5 +1,5 @@
 import { Router } from "express";
-import client from "@repo/db/client";
+import client from "../../db/client";
 import { userMiddleware, founderMiddleware, mentorMiddleware, investorMiddleware } from "../../middleware/user";
 import { 
     CreateStartupProfileSchema, 

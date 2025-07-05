@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { userMiddleware } from "../../middleware/user";
 import { AIService } from "../../services/aiService";
-import client from "@repo/db/client";
+import client from "../../db/client";
 
 export const aiRouter = Router();
 
