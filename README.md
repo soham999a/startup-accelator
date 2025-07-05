@@ -118,6 +118,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Inspired by the startup ecosystem
 - Designed for the next generation of entrepreneurs
 
----
-
-**Made with ❤️ for the startup community**
+--
